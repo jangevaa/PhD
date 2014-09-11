@@ -5,20 +5,25 @@
 import numpy as np
 import pandas as pd
 
-"""Individual information contains disease state, location, and any other variables which may relate to probability of infection"""
+"""Individual information contains disease state, location, group ID, and any other variables which may relate to probability of infection"""
 
-def unif_indvs(n, x, y):
+def unif_indvs(n, x1, x2, y1, y2, group):
     """Generates `n`, random uniformly distributed individuals over a cartesian study area bounded East-West by x1 and x2,
-    and bounded North-South by `y1` and `y2`.
+    and North-South by `y1` and `y2` with group name `group`.
     """
+    if not isinstance(group, str):
+        raise AssertionError("Group name must be string")
     return pd.DataFrame({'x':np.random.uniform(x1, x2, n),
-                  'y':np.random.uniform(y2, y2, n)})
+                  'y':np.random.uniform(y1, y2, n), 'group':np.repeat(group, n)})
                   
-def norm_indvs(n, x_mean, y_mean, x_var, y_var, xy_cov):
+def norm_indvs(n, x_mean, y_mean, x_var, y_var, xy_cov, group):
     """Generates `n`, bivariate normally distributed individuals over a cartesian study area with mean `x_mean, y_mean`, 
     East-West variance of `x_var`, North-South variance of `y_var`, and East-West, North-South covariance `xy_cov`.
     """
-    return pd.DataFrame(np.random.multivariate_normal([x_mean, y_mean], [[x_var, xy_cov],[xy_cov, y_var]], n), columns=['x', 'y'])
-    
+    if not isinstance(group, str):
+        raise AssertionError("Group name must be string")
+    return pd.DataFrame(np.column_stack((np.repeat(group, n),(np.random.multivariate_normal([x_mean, y_mean], [[x_var, xy_cov],[xy_cov, y_var]], n)))), columns=['group', 'x', 'y'])
+
+
     
 
