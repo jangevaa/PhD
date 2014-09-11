@@ -1,6 +1,9 @@
-# Define individuals and their attributes
-# September 2014
-# Justin Angevaare
+""""
+individuals.py
+Define individuals and their attributes
+September 2014
+Justin Angevaare
+""""
 
 import numpy as np
 import pandas as pd
@@ -24,6 +27,12 @@ def norm_indvs(n, x_mean, y_mean, x_var, y_var, xy_cov, group):
         raise AssertionError("Group name must be string")
     return pd.DataFrame(np.column_stack((np.repeat(group, n),(np.random.multivariate_normal([x_mean, y_mean], [[x_var, xy_cov],[xy_cov, y_var]], n)))), columns=['group', 'x', 'y'])
 
-
-    
-
+def multi_groups(x):
+    """Combines multiple groups (unique group names are suggested) into a single database for use in the ILM, with the goal being
+    to grant the ability to model disease transmission amongst groups isolated geographically by user-defined extents, or
+    perhaps to allow for other group dynamics in the future. `x` is tuple of individually defined groups.
+    """
+    temp=x[0]
+    for i in range(1, len(x)):
+        temp=temp.append(x[i])
+    return temp
