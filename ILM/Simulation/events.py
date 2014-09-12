@@ -25,32 +25,46 @@ def omega_t(pop):
 
 def find_infectious(pop, event_db, time):
     """Find individuals which are infected at a specified `time` (i.e.had a change in infection status prior to 
-    `time`. Function returns the index of infectious individuals)
+    `time`. Function returns the indices of infectious individuals)
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
 
 def find_susceptible(pop, event_db, time):
     """Find individuals which are still susceptible at a specified `time` (i.e. have not had a change in infection status prior to 
-    `time`. Function returns the index of susceptible individuals)
+    `time`. Function returns the indices of susceptible individuals)
     """
     return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.time<time)].ind_ID)})
         
-def euclid_dst_helper(pop, beta, infectious, susceptible):
-    """Function to find the sum of euclidean distance**`beta` between a susceptible and all infectious individuals... this function is
-    then utilizes `map` to apply to all susceptible individuals in `kappa`.
+def euclid_dst_helper_1(pop, beta, infectious, susceptible, i, j):
+    return np.power(np.sqrt(np.sum(np.power([(pop.x[susceptible.ind_ID[i]] - pop.x[infectious.ind_ID[j]]), (pop.y[susceptible.ind_ID[i]] - pop.y[infectious.ind_ID[j]])], 2))), -beta)
+    
+def euclid_dst_helper_2(pop, beta, infectious, susceptible, i):
+    def euclid_helper_2_sub(j):
+        return euclid_dst_helper_1(pop, beta, infectious, susceptible, i, j)
+    return np.sum(map(euclid_helper_2_sub, infectious.index))
+    
+def euclid_dst(pop, beta, infectious, susceptible):
+    def euclid_dst_sub(i):
+        return euclid_dst_helper_2(pop, beta, infectious, susceptible, i)
+    return map(euclid_dst_sub, susceptible.index)
+
+def kappa_helper_1(pop, beta, infectious, susceptible, i, j):
+    return np.power(np.sqrt(np.sum(np.power([(pop.x[susceptible.ind_ID[i]] - pop.x[infectious.ind_ID[j]]), (pop.y[susceptible.ind_ID[i]] - pop.y[infectious.ind_ID[j]])], 2))), -beta)
+    
+def kappa_helper_2(pop, beta, infectious, susceptible, i):
+    def kappa_helper_2_sub(j):
+        return kappa_helper_1(pop, beta, infectious, susceptible, i, j)
+    return np.sum(map(kappa_helper_2_sub, infectious.index))
+    
+def kappa(pop, beta, event_db, time):
+    """This function finds the sum of euclidean distance^`beta` between a susceptible and all infectious individuals at `time`... this function is
+    then utilizes `map` to efficiently apply to all susceptible individuals.
     """
-    
-    pop.x[], pop.y
-    
-    
-def kappa(pop, event_db, time, alpha, beta):
-    """Infection kernel - risk in relation to a measure of seperation of infected and susceptible individuals"""
-    infected=np.array(event_db.ind_ID[(event_db.time<time)&(event_db.event_details=="i")])
-    pop.index==any(infected)
-    susceptible=np.array(event_db.ind_ID[(event_db.time<time)&(event_db.event_details=="i")])
-    euclid_dist(pop, beta, infected, susceptible)
-    
-    
+    infectious = find_infectious(pop, event_db_time)
+    susceptible = find_susceptible(pop, event_db_time)
+    def euclid_dst_sub(i):
+        return euclid_dst_helper_2(pop, beta, infectious, susceptible, i)
+    return map(euclid_dst_sub, susceptible.index) 
     
 def epsilon(pop, time):
     """Sparks term - infection process which describe some other random behaviour (e.g. infections originating from 
