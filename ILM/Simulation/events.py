@@ -50,8 +50,8 @@ def kappa(pop, beta, event_db, time):
     then find the euclidean distance between each infectious and susceptible individuals to the power of -`beta`. Return 
     the sum of this for each susceptible individual 
     """
-    infectious = find_infectious(pop, event_db_time)
-    susceptible = find_susceptible(pop, event_db_time)
+    infectious = find_infectious(pop, event_db, time)
+    susceptible = find_susceptible(pop, event_db, time)
     def euclid_dst_sub(i):
         return euclid_dst_helper_2(pop, beta, infectious, susceptible, i)
     return map(euclid_dst_sub, susceptible.index) 
@@ -62,6 +62,10 @@ def epsilon(pop, time):
     in some manner. Currently only the zero assumption is supported.
     """
     return np.repeat(0, pop.shape[0])
+
+def infect_prob(pop, alpha, beta, event_db, time):
+    """Determine infection probabilities for each susceptible individual following ILM framework."""
+    return 1-np.exp(np.multiply(-alpha, kappa(pop, beta, event_db, time)))
 
 def si_model(alpha, beta):
     """SI (susceptible, infected) ILM."""
