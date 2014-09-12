@@ -34,19 +34,6 @@ def find_susceptible(pop, event_db, time):
     `time`. Function returns the indices of susceptible individuals)
     """
     return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.time<time)].ind_ID)})
-        
-def euclid_dst_helper_1(pop, beta, infectious, susceptible, i, j):
-    return np.power(np.sqrt(np.sum(np.power([(pop.x[susceptible.ind_ID[i]] - pop.x[infectious.ind_ID[j]]), (pop.y[susceptible.ind_ID[i]] - pop.y[infectious.ind_ID[j]])], 2))), -beta)
-    
-def euclid_dst_helper_2(pop, beta, infectious, susceptible, i):
-    def euclid_helper_2_sub(j):
-        return euclid_dst_helper_1(pop, beta, infectious, susceptible, i, j)
-    return np.sum(map(euclid_helper_2_sub, infectious.index))
-    
-def euclid_dst(pop, beta, infectious, susceptible):
-    def euclid_dst_sub(i):
-        return euclid_dst_helper_2(pop, beta, infectious, susceptible, i)
-    return map(euclid_dst_sub, susceptible.index)
 
 def kappa_helper_1(pop, beta, infectious, susceptible, i, j):
     return np.power(np.sqrt(np.sum(np.power([(pop.x[susceptible.ind_ID[i]] - pop.x[infectious.ind_ID[j]]), (pop.y[susceptible.ind_ID[i]] - pop.y[infectious.ind_ID[j]])], 2))), -beta)
