@@ -36,16 +36,19 @@ def find_susceptible(pop, event_db, time):
     return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.time<time)].ind_ID)})
 
 def kappa_helper_1(pop, beta, infectious, susceptible, i, j):
+    """Find euclidean distance ^ -`beta` between a susceptible individual `i` and an infectious individual `j`."""
     return np.power(np.sqrt(np.sum(np.power([(pop.x[susceptible.ind_ID[i]] - pop.x[infectious.ind_ID[j]]), (pop.y[susceptible.ind_ID[i]] - pop.y[infectious.ind_ID[j]])], 2))), -beta)
     
 def kappa_helper_2(pop, beta, infectious, susceptible, i):
+    """Sum the euclidean distance ^-'beta' between all infectious individuals, and a susceptible individual `i`."""
     def kappa_helper_2_sub(j):
         return kappa_helper_1(pop, beta, infectious, susceptible, i, j)
     return np.sum(map(kappa_helper_2_sub, infectious.index))
     
 def kappa(pop, beta, event_db, time):
-    """This function finds the sum of euclidean distance^`beta` between a susceptible and all infectious individuals at `time`... this function is
-    then utilizes `map` to efficiently apply to all susceptible individuals.
+    """Determine which individuals in the `pop` are infectious and susceptible at a specified `time` from the `event_db`,
+    then find the euclidean distance between each infectious and susceptible individuals to the power of -`beta`. Return 
+    the sum of this for each susceptible individual 
     """
     infectious = find_infectious(pop, event_db_time)
     susceptible = find_susceptible(pop, event_db_time)
