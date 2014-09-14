@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import multiprocessing as mp
 
 def event_db(n, pop):
     """Create an event database, and with `n` initial infection events, based on a specified population, `pop`."""
@@ -50,12 +49,11 @@ def kappa(pop, beta, event_db, time):
     then find the euclidean distance between each infectious and susceptible individuals to the power of -`beta`. Return 
     the sum of this for each susceptible individual 
     """
-    p=mp.Pool(8)
     infectious = find_infectious(pop, event_db, time)
     susceptible = find_susceptible(pop, event_db, time)
     def kappa_sub(i):
         return kappa_helper_2(pop, beta, infectious, susceptible, i)
-    return p.map(kappa_sub, susceptible.index) 
+    return map(kappa_sub, susceptible.index) 
     
 def epsilon(pop, time):
     """Sparks term - infection process which describe some other random behaviour (e.g. infections originating from 
