@@ -44,13 +44,11 @@ def kappa_helper_2(pop, beta, infectious, susceptible, i):
         return kappa_helper_1(pop, beta, infectious, susceptible, i, j)
     return np.sum(map(kappa_helper_2_sub, infectious.index))
     
-def kappa(pop, beta, event_db, time):
+def kappa(pop, beta, infectious, susceptible):
     """Determine which individuals in the `pop` are infectious and susceptible at a specified `time` from the `event_db`,
     then find the euclidean distance between each infectious and susceptible individuals to the power of -`beta`. Return 
     the sum of this for each susceptible individual 
     """
-    infectious = find_infectious(pop, event_db, time)
-    susceptible = find_susceptible(pop, event_db, time)
     def kappa_sub(i):
         return kappa_helper_2(pop, beta, infectious, susceptible, i)
     return map(kappa_sub, susceptible.index) 
@@ -62,9 +60,20 @@ def epsilon(pop, time):
     """
     return np.repeat(0, pop.shape[0])
 
-def infect_prob(pop, alpha, beta, event_db, time):
+def infect_prob(pop, alpha, beta, infectious, susceptible):
     """Determine infection probabilities for each susceptible individual following ILM framework."""
-    return 1-np.exp(np.multiply(-alpha, kappa(pop, beta, event_db, time)))
+    return 1-np.exp(np.multiply(-alpha, kappa(pop, beta, infectious, susceptible)))
+
+def infect(pop, alpha, beta, event_db, time):
+    """Probablistically propagate disease, and return an updated event database."""
+    infectious = find_infectious(pop, event_db, time)
+    susceptible = find_susceptible(pop, event_db, time)
+    prob = infect_prob(pop, alpha, beta, infectious, susceptible)
+    new_infections = susceptible.index[np.where(prob < np.random.uniform(0, 1, size=prob.size))]
+    return event_db.append(pd.DataFrame({"time":np.repeat(time, new_infections.size), 
+                 "ind_ID":new_infections, 
+                 "event_type":np.repeat("infection_status",new_infections.size), 
+                 "event_details":np.repeat("i",new_infections.size)}))
 
 def si_model(alpha, beta):
     """SI (susceptible, infected) ILM."""
