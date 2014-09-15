@@ -10,18 +10,6 @@ def event_db(n, pop):
                          "event_type":np.repeat("infection_status",n), 
                          "event_details":np.repeat("i",n)})
     
-def omega_s(pop):
-    """Susceptibility function - generate a vector of individual specific susceptibility (e.g. related to individual 
-    covariates), currently only a constant (of 1) is supported.
-    """
-    return np.repeat(1, pop.shape[0])
-    
-def omega_t(pop):
-    """Transmissability function - generate a vector of individual specific transmissability (e.g. related to 
-    individual covariates), currently only a constant (of 1) is supported.
-    """
-    return np.repeat(1, pop.shape[0])
-
 def find_infectious(pop, event_db, time):
     """Find individuals which are infected at a specified `time` (i.e.had a change in infection status prior to 
     `time`. Function returns the indices of infectious individuals)
@@ -53,13 +41,11 @@ def kappa(pop, beta, infectious, susceptible):
         return kappa_helper_2(pop, beta, infectious, susceptible, i)
     return map(kappa_sub, susceptible.index) 
     
-def epsilon(pop, time):
-    """Sparks term - infection process which describe some other random behaviour (e.g. infections originating from 
-    outside influences). Often assumed as 0, but could be set to be individual, time, and/or epidemic specific
-    in some manner. Currently only the zero assumption is supported.
+def exp_helper(x):
+    """Understand when extreme values are inputted to the `numpy.exp` function, and return an approximation rather 
+    than an error.
     """
-    return np.repeat(0, pop.shape[0])
-
+    
 def infect_prob(pop, alpha, beta, infectious, susceptible):
     """Determine infection probabilities for each susceptible individual following ILM framework."""
     return 1-np.exp(np.multiply(-alpha, kappa(pop, beta, infectious, susceptible)))
@@ -69,14 +55,41 @@ def infect(pop, alpha, beta, event_db, time):
     infectious = find_infectious(pop, event_db, time)
     susceptible = find_susceptible(pop, event_db, time)
     prob = infect_prob(pop, alpha, beta, infectious, susceptible)
-    new_infections = susceptible.index[np.where(prob < np.random.uniform(0, 1, size=prob.size))]
-    return event_db.append(pd.DataFrame({"time":np.repeat(time, new_infections.size), 
-                 "ind_ID":new_infections, 
-                 "event_type":np.repeat("infection_status",new_infections.size), 
-                 "event_details":np.repeat("i",new_infections.size)}))
+    new_infections = susceptible.ind_ID[np.asarray(np.where(prob > np.random.uniform(0, 1, size=prob.size))).flat]
+    return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, new_infections.size)), 
+                         "ind_ID":np.append(event_db.ind_ID, new_infections), 
+                         "event_type":np.append(event_db.event_type, np.repeat("infection_status",new_infections.size)), 
+                         "event_details":np.append(event_db.event_details, np.repeat("i",new_infections.size))})
 
-def si_model(alpha, beta):
-    """SI (susceptible, infected) ILM."""
+def si_model(pop, init, length, alpha, beta):
+    """SI (susceptible, infected) ILM. `init` are the amount of initial infections which are randomly generated
+    at time 0. `length` is the simulation length in days."""
+    edb = event_db(init, pop)
+    for i in range(1, (length+1)):
+        edb = infect(pop, alpha, beta, edb, i)
+    return edb
+
+# Unused or incomplete functions currently below this line
+
+def omega_s(pop):
+    """Susceptibility function - generate a vector of individual specific susceptibility (e.g. related to individual 
+    covariates), currently only a constant (of 1) is supported.
+    """
+    return np.repeat(1, pop.shape[0])
+    
+def omega_t(pop):
+    """Transmissability function - generate a vector of individual specific transmissability (e.g. related to 
+    individual covariates), currently only a constant (of 1) is supported.
+    """
+    return np.repeat(1, pop.shape[0])
+
+
+def epsilon(pop, time):
+    """Sparks term - infection process which describe some other random behaviour (e.g. infections originating from 
+    outside influences). Often assumed as 0, but could be set to be individual, time, and/or epidemic specific
+    in some manner. Currently only the zero assumption is supported.
+    """
+    return np.repeat(0, pop.shape[0])
 
 def sir_model(I_dur, alpha, beta):
     """SIR (susceptible, infected, recovered/removed) ILM where the recovery period is constant"""
