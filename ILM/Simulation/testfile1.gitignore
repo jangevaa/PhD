@@ -1,0 +1,16 @@
+"""test.py - file for easily testing functionality as program is built"""
+
+"""Generate population (500 individuals)"""
+pop = unif_indvs(500, 0, 10, 0, 10, 'test_pop')
+
+"""Generate an event database... with 1 initial infection at time 0"""
+edb = event_db(1, pop)
+
+"""Propagate infection"""
+edb = infect(pop, 2, 5, edb, 1)
+edb = infect(pop, 2, 5, edb, 2)
+edb = infect(pop, 2, 5, edb, 3)
+
+test = si_model(pop, 1, 10, 1, 10)
+test.to_csv("/Users/justin/Dropbox/Projects/[in progress] PhD research/ILM/Simulation/example_event_database.csv")
+pop.to_csv("/Users/justin/Dropbox/Projects/[in progress] PhD research/ILM/Simulation/example_pop.csv")
