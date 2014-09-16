@@ -61,15 +61,6 @@ def infect(pop, alpha, beta, event_db, time):
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",new_infections.size)), 
                          "event_details":np.append(event_db.event_details, np.repeat("i",new_infections.size))})
 
-def si_model(pop, init, length, alpha, beta):
-    """SI (susceptible, infected) ILM. `init` are the amount of initial infections which are randomly generated
-    at time 0. `length` is the simulation length in days."""
-    edb = event_db(init, pop)
-    for i in range(1, (length+1)):
-        edb = infect(pop, alpha, beta, edb, i)
-    return edb
-
-
 # Unused or incomplete functions currently below this line
 
 def omega_s(pop):
