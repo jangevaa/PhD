@@ -8,10 +8,62 @@ import matplotlib.animation as animation
 """csv output instructions: you can easily export a csv of the population file or the
 event database by using the `DF.to_csv("/dir/ect/ory/")`, where DF represents the data
 that will be exported.
-""""
+"""
 
-
-plot_infection(pop, event_db, time):
+def plot_infection(pop, event_db, time):
     """This will create a simple scatterplot of susceptible and infectious individuals at
-    a given time"
+    a given time
+    """
+    i=find_infectious(pop, event_db, time)
+    s=find_susceptible(pop, event_db, time)
+    status=pd.DataFrame({"status":np.append(np.repeat("i", i.shape[0]), np.repeat("s", s.shape[0])), 
+                         "ind_ID":np.append(i.ind_ID, s.ind_ID),
+                         "x":pop.iloc[np.append(i.ind_ID, s.ind_ID)].x,
+                         "y":pop.iloc[np.append(i.ind_ID, s.ind_ID)].y})
+    colours = np.where(status.status=="i", "r", "k")
+    plt.scatter(status.x, status.y, c=colours)
+
+# Unused or incomplete functions currently below this line    
+            
+def infection_animation(pop, event_db):
+    """This will create an animation of infection spread."""
+    fig = plt.figure()
+    ax = plt.axes(xlim=(np.floor(min(pop.x)), np.ceil(max(pop.x))), ylim=(np.floor(min(pop.y)), np.ceil(max(pop.y))))
+    scatter, = ax.plot([], [], lw=2)
+    def init():
+        scatter.set_data([], [])
+        return scatter,
+    def animate(time):
+        i = find_infectious(pop, event_db, time)
+        s = find_susceptible(pop, event_db, time)
+        c = np.append(np.repeat("r", i.shape[0]), np.repeat("k", s.shape[0]))
+        x=pop.iloc[np.append(i.ind_ID, s.ind_ID)].x
+        y=pop.iloc[np.append(i.ind_ID, s.ind_ID)].y
+        scatter.set_data(x, y)
+        return scatter,
+    anim = animation.FuncAnimation(fig, animate, init_func=init,
+                                   frames=10, interval=1, blit=True)        
+    anim.save('infection_spread.mp4', fps=1, extra_args=['-vcodec', 'libx264'])
+    
+def main(pop, event_db):
+    numframes = max(np.ceil(event_db.time))
+    time=0
+    d = find_infectious(pop, event_db, time)
+    s = find_susceptible(pop, event_db, time)
+    c = np.append(np.repeat("r", d.shape[0]), np.repeat("k", s.shape[0]))
+    x=pop.iloc[np.append(d.ind_ID, s.ind_ID)].x
+    y=pop.iloc[np.append(d.ind_ID, s.ind_ID)].y
+    fig = plt.figure()
+    scat = plt.scatter(x=x, y=y, c=c)
+    def update_plot(i):
+        d = find_infectious(pop, event_db, i)
+        s = find_susceptible(pop, event_db, i)
+        c = np.append(np.repeat("r", d.shape[0]), np.repeat("k", s.shape[0]))
+        scat.set_data(x=x,y=y,c=c)
+        return scat,
+    ani = animation.FuncAnimation(fig, update_plot, frames=10)
+    #ani.save('infection_spread.mp4', fps=1, extra_args=['-vcodec', 'libx264'])
+
+main(pop, test)
+    
     
