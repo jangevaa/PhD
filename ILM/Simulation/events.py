@@ -69,6 +69,7 @@ def si_model(pop, init, length, alpha, beta):
         edb = infect(pop, alpha, beta, edb, i)
     return edb
 
+
 # Unused or incomplete functions currently below this line
 
 def omega_s(pop):
