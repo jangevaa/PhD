@@ -18,7 +18,6 @@ for time in range(0,10):
 """Inference testing..."""
 
 """Define prior distributions for alpha and beta"""
-import scipy as sp
 
 def prior_alpha(x):
     gamma_alpha=5
@@ -30,3 +29,9 @@ def prior_beta(x):
     gamma_beta=1
     return pdf_gamma(gamma_alpha, gamma_beta, x)
     
+init_alpha=np.random.gamma(5, 1)
+
+init_beta=np.random.gamma(5, 1)
+
+test[test.time==1]
+np.max(test.time)
