@@ -38,16 +38,7 @@ def si_likelihood(pop, event_db, alpha, beta):
     def new_infections_func(x):
         return any(susceptible.ind_ID[x] == new_infectious.ind_ID)
     new_infections = map(new_infections_func, susceptible.index)
-    return np.prod(np.subtract(1, infection_probs[np.where(np.invert(new_infections))]))*np.prod(infection_probs[np.where(new_infections)])
-
-                
-    #still_susceptible = susceptible.ind_ID == any(find_susceptible(pop, event_db, t+1).ind_ID)
-    return new_infections
-    #return np.where(new_infections)
-    #return infection_probs[np.where(new_infections)]
-    
-    #find_susceptible(pop, event_db, t+1)
-    
+    return np.prod(np.subtract(1, infection_probs[np.where(np.invert(new_infections))]))*np.prod(infection_probs[np.where(new_infections)])    
     
 def si_infer(pop, event_db, prior_alpha, prior_beta, iterations):
     """perform simple Metropolis-Hastings for an SI model with specified
