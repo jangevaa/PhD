@@ -61,8 +61,8 @@ def si_infer(pop, event_db, prior_alpha, init_alpha, prior_beta, init_beta, iter
         new_density = si_likelihood(pop, event_db, proposals[0], proposals[1])*prior_alpha(proposals[0])*prior_beta(proposals[1])
         if max([1, (new_density/density[i-1])]) > np.random.uniform(0,1,1):
             density[i] = new_density
-            alpha[i] = proposals[0]
-            beta[i] = proposals[1]
+            alpha[i] = proposals[0][0]
+            beta[i] = proposals[0][1]
         else:
             density[i] = density[i-1]
             alpha[i] = alpha[i-1]
