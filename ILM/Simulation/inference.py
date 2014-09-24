@@ -27,20 +27,24 @@ def si_likelihood(pop, event_db, alpha, beta):
     """Determine the likelihood of the data from an SI simulation given alpha 
     and beta
     """
-    t=2
-    # Probability of staying susceptible = 1-probability of infection
-    #for t in range(1, np.max(event_db.time))
+    daily_likelihood=[0]*(np.max(event_db.time)-1)
+    t=1
     infectious=find_infectious(pop, event_db, t)
     susceptible=find_susceptible(pop, event_db, t)
-    new_infectious=find_infectious(pop, event_db, t+1)
-    new_susceptible=find_susceptible(pop, event_db, t+1)
-    infection_probs=infect_prob(pop, alpha, beta, infectious, susceptible)
-    def new_infections_func(x):
-        return any(susceptible.ind_ID[x] == new_infectious.ind_ID)
-    new_infections = map(new_infections_func, susceptible.index)
-    return np.prod(np.subtract(1, infection_probs[np.where(np.invert(new_infections))]))*np.prod(infection_probs[np.where(new_infections)])    
+    for t in range(1, np.max(event_db.time)):
+        new_infectious=find_infectious(pop, event_db, t+1)
+        new_susceptible=find_susceptible(pop, event_db, t+1)
+        infection_probs=infect_prob(pop, alpha, beta, infectious, susceptible)
+        def new_infections_func(x):
+            return any(susceptible.ind_ID[x] == new_infectious.ind_ID)
+        new_infections = map(new_infections_func, susceptible.index)
+        daily_likelihood[t-1]=np.prod(np.subtract(1, infection_probs[np.where(np.invert(new_infections))]))*np.prod(infection_probs[np.where(new_infections)])    
+        infectious=new_infectious
+        susceptible=new_susceptible
+    return np.prod(daily_likelihood)
     
 def si_infer(pop, event_db, prior_alpha, prior_beta, iterations):
     """perform simple Metropolis-Hastings for an SI model with specified
     prior pdfs for alpha and beta (these functions should take a single parameter)
     """
+    si_likelihood(pop, event_db
