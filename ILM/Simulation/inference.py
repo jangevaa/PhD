@@ -8,8 +8,11 @@ import numpy as np
 
 def pdf_gamma(gamma_alpha, gamma_beta, x):
     """Gamma pdf"""
-    return((gamma_beta**gamma_alpha)*(x**(gamma_alpha-1))*np.exp(-gamma_beta*x))/special.gamma(gamma_alpha)
-
+    if x > 0.:
+        return((gamma_beta**gamma_alpha)*(x**(gamma_alpha-1))*np.exp(-gamma_beta*x))/special.gamma(gamma_alpha)
+    else:
+        return 0.
+        
 def pdf_unif(lower, upper, x):
     """Uniform pdf"""
     def pdf_unif(x):
@@ -43,8 +46,25 @@ def si_likelihood(pop, event_db, alpha, beta):
         susceptible=new_susceptible
     return np.prod(daily_likelihood)
     
-def si_infer(pop, event_db, prior_alpha, prior_beta, iterations):
+def si_infer(pop, event_db, prior_alpha, init_alpha, prior_beta, init_beta, iterations, transition_cov):
     """perform simple Metropolis-Hastings for an SI model with specified
     prior pdfs for alpha and beta (these functions should take a single parameter)
     """
-    si_likelihood(pop, event_db
+    alpha=[0]*iterations
+    beta=[0]*iterations
+    density=[0]*iterations
+    alpha[0]=init_alpha
+    beta[0]=init_beta
+    density[0] = si_likelihood(pop, event_db, alpha[0], beta[0])*prior_alpha(alpha[0])*prior_beta(beta[0])
+    for i in range(1, iterations):
+        proposals = np.random.multivariate_normal([alpha[i-1], beta[i-1]], transition_cov, 1)    
+        new_density = si_likelihood(pop, event_db, proposals[0], proposals[1])*prior_alpha(proposals[0])*prior_beta(proposals[1])
+        if max([1, (new_density/density[i-1])]) > np.random.uniform(0,1,1):
+            density[i] = new_density
+            alpha[i] = proposals[0]
+            beta[i] = proposals[1]
+        else:
+            density[i] = density[i-1]
+            alpha[i] = alpha[i-1]
+            beta[i] = beta[i-1]
+    return beta, alpha

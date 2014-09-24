@@ -33,5 +33,4 @@ init_alpha=np.random.gamma(5, 1)
 
 init_beta=np.random.gamma(5, 1)
 
-test[test.time==1]
-np.max(test.time)
+si_infer(pop, test, prior_alpha, init_alpha, prior_beta, init_beta, 5, [[1,0],[0,1]])
