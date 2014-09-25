@@ -39,4 +39,4 @@ plt.plot(mcmc.alpha)
 plt.plot(mcmc.beta)
 plt.plot(mcmc.density)
 
-mcmc.density
+isinstance(mcmc.density[89], numbers.Real)
