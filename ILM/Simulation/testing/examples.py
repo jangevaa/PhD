@@ -33,7 +33,7 @@ init_alpha=np.random.gamma(5, 1)
 
 init_beta=np.random.gamma(5, 1)
 
-mcmc=si_infer(pop, test, prior_alpha, init_alpha, prior_beta, init_beta, 200, [[1,0],[0,1]])
+mcmc=si_infer(pop, test, prior_alpha, init_alpha, prior_beta, init_beta, 100, [[1,0],[0,1]])
 
-plt.plot(mcmc[0])
-plt.plot(mcmc[1])
+plt.plot(mcmc.alpha)
+plt.plot(mcmc.beta)
