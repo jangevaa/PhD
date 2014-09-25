@@ -37,3 +37,6 @@ mcmc=si_infer(pop, test, prior_alpha, init_alpha, prior_beta, init_beta, 100, [[
 
 plt.plot(mcmc.alpha)
 plt.plot(mcmc.beta)
+plt.plot(mcmc.density)
+
+mcmc.density

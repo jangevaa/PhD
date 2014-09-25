@@ -59,7 +59,7 @@ def si_infer(pop, event_db, prior_alpha, init_alpha, prior_beta, init_beta, iter
     for i in range(1, iterations):
         proposals = np.random.multivariate_normal([alpha[i-1], beta[i-1]], transition_cov)    
         new_density = si_likelihood(pop, event_db, proposals[0], proposals[1])*prior_alpha(proposals[0])*prior_beta(proposals[1])
-        if min([1., (new_density/density[i-1])]) > (np.random.uniform(0,1,1)[0]):
+        if all([min([1., (new_density/density[i-1])]) > (np.random.uniform(0,1,1)[0]),isinstance(new_density, float)]):
             density[i] = new_density
             alpha[i] = proposals[0]
             beta[i] = proposals[1]
