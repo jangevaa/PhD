@@ -33,7 +33,7 @@ init_alpha=np.random.gamma(5, 1)
 
 init_beta=np.random.gamma(5, 1)
 
-mcmc=si_infer(pop, test, prior_alpha, init_alpha, prior_beta, init_beta, 500, [[1,0],[0,4]])
+mcmc=si_infer(pop, test, prior_alpha, 1, prior_beta, 10, 1000, [[1,0],[0,4]])
 
 plt.plot(mcmc.alpha)
 plt.plot(mcmc.beta)
@@ -41,3 +41,14 @@ plt.plot(mcmc.density)
 
 # Estimate optimal proposal covariance as (Rosenthal)
 optcov=numpy.cov(mcmc.alpha, mcmc.beta)*((2.38**2.)/2.)
+
+mcmc=si_infer(pop, test, prior_alpha, 1, prior_beta, 10, 5000, optcov)
+
+plt.plot(mcmc.alpha)
+savefig(savedir + "example_mcmc_alpha.png")
+
+plt.plot(mcmc.beta)
+savefig(savedir + "example_mcmc_beta.png")
+
+plt.plot(mcmc.density)
+savefig(savedir + "example_mcmc_density.png")
