@@ -39,7 +39,7 @@ plt.plot(mcmc.alpha)
 plt.plot(mcmc.beta)
 plt.plot(mcmc.density)
 
-# Estimate optimal proposal covariance as (Rosenthal)
+"""Estimate optimal proposal covariance as (Rosenthal)"""
 optcov=numpy.cov(mcmc.alpha, mcmc.beta)*((2.38**2.)/2.)
 
 mcmc=si_infer(pop, test, prior_alpha, 1, prior_beta, 10, 5000, optcov)
@@ -52,3 +52,8 @@ savefig(savedir + "example_mcmc_beta.png")
 
 plt.plot(mcmc.density)
 savefig(savedir + "example_mcmc_density.png")
+
+
+"""Test SIR model simulation..."""
+pop = unif_indvs(100, 0, 10, 0, 10, 'test_pop')
+test1 = sicr_model(pop, 1, 10, 1, 10, 5)

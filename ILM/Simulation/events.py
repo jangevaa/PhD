@@ -16,6 +16,13 @@ def find_infectious(pop, event_db, time):
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
 
+def find_infectious2(pop, event_db, time):
+    """Find individuals which are infected at a specified `time` (i.e. not susceptible or recovered...)
+    """
+    recovered=pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
+    infected=pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
+    return recovered, infected
+
 def find_susceptible(pop, event_db, time):
     """Find individuals which are still susceptible at a specified `time` (i.e. have not had a change in infection status prior to 
     `time`. Function returns the indices of susceptible individuals)
@@ -39,12 +46,7 @@ def kappa(pop, beta, infectious, susceptible):
     """
     def kappa_sub(i):
         return kappa_helper_2(pop, beta, infectious, susceptible, i)
-    return map(kappa_sub, susceptible.index) 
-    
-def exp_helper(x):
-    """Understand when extreme values are inputted to the `numpy.exp` function, and return an approximation rather 
-    than an error.
-    """
+    return map(kappa_sub, susceptible.index)
     
 def infect_prob(pop, alpha, beta, infectious, susceptible):
     """Determine infection probabilities for each susceptible individual following ILM framework."""
@@ -60,6 +62,15 @@ def infect(pop, alpha, beta, event_db, time):
                          "ind_ID":np.append(event_db.ind_ID, new_infections), 
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",new_infections.size)), 
                          "event_details":np.append(event_db.event_details, np.repeat("i",new_infections.size))})
+
+def constant_recover(pop, event_db, time, gamma):
+    """Individuals recover after a specified infection duration, `gamma` (constant)."""
+    recovered = np.array(find_infectious(pop, event_db, time-gamma).ind_ID)
+    return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, recovered.size)), 
+                         "ind_ID":np.append(event_db.ind_ID, recovered), 
+                         "event_type":np.append(event_db.event_type, np.repeat("infection_status",recovered.size)), 
+                         "event_details":np.append(event_db.event_details, np.repeat("r",recovered.size))})
+    
 
 #Unused or incomplete functions currently below this line
 #

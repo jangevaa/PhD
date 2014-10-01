@@ -13,3 +13,12 @@ def si_model(pop, init, length, alpha, beta):
     for i in range(1, (length+1)):
         edb = infect(pop, alpha, beta, edb, i)
     return edb
+    
+def sicr_model(pop, init, length, alpha, beta, gamma):
+    """Discrete SI (susceptible, infected) ILM. `init` are the amount of initial infections which are randomly generated
+    at time 0. `length` is the simulation length in days."""
+    edb = event_db(init, pop)
+    for i in range(1, (length+1)):
+        edb = infect(pop, alpha, beta, edb, i)
+        edb = constant_recover(pop, edb, i, gamma)
+    return edb
