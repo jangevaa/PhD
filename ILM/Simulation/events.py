@@ -11,7 +11,7 @@ def event_db(n, pop):
                          "event_details":np.repeat("i",n)})
     
 def find_infectious(pop, event_db, time):
-    """Find individuals which have been infected prior to a specified `time` (i.e.had a change in infection status prior to 
+    """Find individuals which have been infected prior to a specified `time` (i.e. had a change in infection status prior to 
     `time`. Function returns the indices of infectious individuals)
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
@@ -20,16 +20,7 @@ def find_infectious2(pop, event_db, time):
     """Find individuals which became infected at a specified `time`.
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time==(time-1))].ind_ID})
-
-def find_nonrecovered(pop, event_db, time):
-    """Find individuals which have been infected prior to `time`, but which have not yet recovered.
-    """
-    recovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
-    nonrecovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
-    def find_nonrecovered_helper(x):
-        return np.any(nonrecovered.ind_ID[x] == recovered.ind_ID)
-    return nonrecovered[np.invert(map(find_nonrecovered_helper, nonrecovered.index))]
-
+    
 def find_susceptible(pop, event_db, time):
     """Find individuals which are still susceptible at a specified `time` (i.e. have not had a change in infection status prior to 
     `time`. Function returns the indices of susceptible individuals)
@@ -93,33 +84,11 @@ def constant_recover(pop, event_db, time, gamma):
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",recovered.size)), 
                          "event_details":np.append(event_db.event_details, np.repeat("r",recovered.size))})
     
-
-#Unused or incomplete functions currently below this line
-#
-#def omega_s(pop):
-#    """Susceptibility function - generate a vector of individual specific susceptibility (e.g. related to individual 
-#    covariates), currently only a constant (of 1) is supported.
-#    """
-#    return np.repeat(1, pop.shape[0])
-#    
-#def omega_t(pop):
-#    """Transmissability function - generate a vector of individual specific transmissability (e.g. related to 
-#    individual covariates), currently only a constant (of 1) is supported.
-#    """
-#    return np.repeat(1, pop.shape[0])
-#
-#
-#def epsilon(pop, time):
-#    """Sparks term - infection process which describe some other random behaviour (e.g. infections originating from 
-#    outside influences). Often assumed as 0, but could be set to be individual, time, and/or epidemic specific
-#    in some manner. Currently only the zero assumption is supported.
-#    """
-#    return np.repeat(0, pop.shape[0])
-#
-#def sir_model(I_dur, alpha, beta):
-#    """SIR (susceptible, infected, recovered/removed) ILM where the recovery period is constant"""
-#    
-#def seir_model(I_dur, alpha, beta):
-#    """SEIR (susceptible, exposed, infected, recovered/removed) ILM where the latent (exposed), and recovery period 
-#    are constant
-#    """
+def geometric_recover(pop, event_db, time, p):
+    """Individuals recover following a memoryless recovery probability each time invoked (i.e. geometric)"""
+    nonrecovered=find_nonrecovered(pop, event_db, time)
+    recovered = np.array(nonrecovered.ind_ID[p>np.random.uniform(0,1, nonrecovered.shape[0])])
+    return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, recovered.size)), 
+                         "ind_ID":np.append(event_db.ind_ID, recovered), 
+                         "event_type":np.append(event_db.event_type, np.repeat("infection_status",recovered.size)), 
+                         "event_details":np.append(event_db.event_details, np.repeat("r",recovered.size))})

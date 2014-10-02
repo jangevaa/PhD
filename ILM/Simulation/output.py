@@ -31,7 +31,7 @@ def plot_sicr(pop, event_db, time):
     s=find_susceptible(pop, event_db, time)
     r=find_recovered(pop, event_db, time)
     status=pd.DataFrame({"status":np.append(np.append(np.repeat("i", i.shape[0]), np.repeat("s", s.shape[0])),np.repeat("r", r.shape[0])),
-                         "colour":np.append(np.append(np.repeat("#e0ecf4", i.shape[0]), np.repeat("#9ebcda", s.shape[0])),np.repeat("#8856a7", r.shape[0])), 
+                         "colour":np.append(np.append(np.repeat("#a6cee3", i.shape[0]), np.repeat("#1f78b4", s.shape[0])),np.repeat("#b2df8a", r.shape[0])), 
                          "ind_ID":np.append(np.append(i.ind_ID, s.ind_ID), r.ind_ID),
                          "x":pop.iloc[np.append(np.append(i.ind_ID, s.ind_ID), r.ind_ID)].x,
                          "y":pop.iloc[np.append(np.append(i.ind_ID, s.ind_ID), r.ind_ID)].y})
