@@ -10,7 +10,7 @@ event database by using the `DF.to_csv("/dir/ect/ory/")`, where DF represents th
 that will be exported.
 """
 
-def plot_infection(pop, event_db, time):
+def plot_si(pop, event_db, time):
     """This will create a simple scatterplot of susceptible and infectious individuals at
     a given time
     """
@@ -22,6 +22,21 @@ def plot_infection(pop, event_db, time):
                          "y":pop.iloc[np.append(i.ind_ID, s.ind_ID)].y})
     colours = np.where(status.status=="i", "r", "k")
     plt.scatter(status.x, status.y, c=colours)
+
+def plot_sicr(pop, event_db, time):
+    """This will create a simple scatterplot of susceptible, infectious, and recovered
+    individuals at a given time
+    """
+    i=find_nonrecovered(pop, event_db, time)
+    s=find_susceptible(pop, event_db, time)
+    r=find_recovered(pop, event_db, time)
+    status=pd.DataFrame({"status":np.append(np.repeat("i", i.shape[0]), np.repeat("s", s.shape[0])), 
+                         "ind_ID":np.append(i.ind_ID, s.ind_ID),
+                         "x":pop.iloc[np.append(i.ind_ID, s.ind_ID)].x,
+                         "y":pop.iloc[np.append(i.ind_ID, s.ind_ID)].y})
+    colours = np.where(status.status=="i", "r", "k")
+    plt.scatter(status.x, status.y, c=colours)
+
 
 #Unused or incomplete functions currently below this line    
 #            

@@ -21,19 +21,36 @@ def find_infectious2(pop, event_db, time):
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time==(time-1))].ind_ID})
 
+def find_nonrecovered(pop, event_db, time):
+    """Find individuals which have been infected prior to `time`, but which have not yet recovered.
+    """
+    recovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
+    nonrecovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
+    def find_nonrecovered_helper(x):
+        return np.any(nonrecovered.ind_ID[x] == recovered.ind_ID)
+    return nonrecovered[np.invert(map(find_nonrecovered_helper, nonrecovered.index))]
+
 def find_susceptible(pop, event_db, time):
     """Find individuals which are still susceptible at a specified `time` (i.e. have not had a change in infection status prior to 
     `time`. Function returns the indices of susceptible individuals)
     """
     return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.time<time)].ind_ID)})
+    
+def find_nonrecovered(pop, event_db, time):
+    """Find individuals which have been infected prior to `time`, but which have not yet recovered.
+    """
+    recovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
+    nonrecovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
+    def find_nonrecovered_helper(x):
+        return np.any(nonrecovered.ind_ID[x] == recovered.ind_ID)
+    return nonrecovered[np.invert(map(find_nonrecovered_helper, nonrecovered.index))]
 
 def find_recovered(pop, event_db, time):
     """Find individuals which have recovered prior to a specified `time` (i.e.had a change in infection status prior to 
     `time`. Function returns the indices of recovered individuals)
     """
-    return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID)})
-
-
+    return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
+    
 def kappa_helper_1(pop, beta, infectious, susceptible, i, j):
     """Find euclidean distance ^ -`beta` between a susceptible individual `i` and an infectious individual `j`."""
     return np.power(np.sqrt(np.sum(np.power([(pop.x[susceptible.ind_ID[i]] - pop.x[infectious.ind_ID[j]]), (pop.y[susceptible.ind_ID[i]] - pop.y[infectious.ind_ID[j]])], 2))), -beta)
@@ -59,7 +76,7 @@ def infect_prob(pop, alpha, beta, infectious, susceptible):
 
 def infect(pop, alpha, beta, event_db, time):
     """Probablistically propagate disease, and return an updated event database."""
-    infectious = find_infectious(pop, event_db, time)
+    infectious = find_nonrecovered(pop, event_db, time)
     susceptible = find_susceptible(pop, event_db, time)
     prob = infect_prob(pop, alpha, beta, infectious, susceptible)
     new_infections = susceptible.ind_ID[np.asarray(np.where(prob > np.random.uniform(0, 1, size=prob.size))).flat]

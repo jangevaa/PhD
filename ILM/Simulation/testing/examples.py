@@ -56,4 +56,4 @@ savefig(savedir + "example_mcmc_density.png")
 
 """Test SIR model simulation..."""
 pop = unif_indvs(100, 0, 10, 0, 10, 'test_pop')
-test1 = sicr_model(pop, 1, 10, 1, 10, 5)
+test1 = sicr_model(pop, 1, 10, 1, 10, 3)
