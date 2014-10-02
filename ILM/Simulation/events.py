@@ -42,6 +42,18 @@ def find_recovered(pop, event_db, time):
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
     
+def find_recoverytimes(event_db):
+    """List infection times for all individuals which have recovered..."""
+    recovered = np.array(event_db.ind_ID[(event_db.event_type == "infection_status") & (event_db.event_details == "r")])
+    def find_recoverytimes_helper(x):
+        return np.array(event_db.time[(event_db.event_type == "infection_status") &
+                                      (event_db.event_details == "r") & 
+                                      (event_db.ind_ID==recovered[x])])[0] - np.array(event_db.time[
+                                      (event_db.event_type == "infection_status") & 
+                                      (event_db.event_details == "i") & 
+                                      (event_db.ind_ID==recovered[x])])[0]
+    return map(find_recoverytimes_helper, range(0, recovered.shape[0]))
+    
 def kappa_helper_1(pop, beta, infectious, susceptible, i, j):
     """Find euclidean distance ^ -`beta` between a susceptible individual `i` and an infectious individual `j`."""
     return np.power(np.sqrt(np.sum(np.power([(pop.x[susceptible.ind_ID[i]] - pop.x[infectious.ind_ID[j]]), (pop.y[susceptible.ind_ID[i]] - pop.y[infectious.ind_ID[j]])], 2))), -beta)
