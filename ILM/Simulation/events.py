@@ -43,7 +43,7 @@ def find_nonrecovered(pop, event_db, time):
     nonrecovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
     def find_nonrecovered_helper(x):
         return np.any(nonrecovered.ind_ID[x] == recovered.ind_ID)
-    return nonrecovered[np.invert(map(find_nonrecovered_helper, nonrecovered.index))]
+    return nonrecovered[np.invert(map(find_nonrecovered_helper, nonrecovered.index))]        
 
 def find_recovered(pop, event_db, time):
     """Find individuals which have recovered prior to a specified `time` (i.e.had a change in infection status prior to 

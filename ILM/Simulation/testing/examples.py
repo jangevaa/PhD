@@ -12,7 +12,7 @@ pop.to_csv(savedir+"example_pop.csv")
 
 """Plot output testing..."""
 for time in range(0,10):
-    plot_infection(pop, test, time)
+    plot_si(pop, test, time)
     savefig(savedir + "example_time" + str(time) + ".png")
 
 """Inference testing..."""
@@ -56,4 +56,8 @@ savefig(savedir + "example_mcmc_density.png")
 
 """Test SIR model simulation..."""
 pop = unif_indvs(100, 0, 10, 0, 10, 'test_pop')
-test1 = sicr_model(pop, 1, 10, 1, 10, 3)
+test1 = sicr_model(pop, 1, 30, 1, 10, 3)
+
+for time in range(1,30):
+    plot_sicr(pop, test1, time)
+    savefig(savedir + "SIR_example_time" + str(time) + ".png")
