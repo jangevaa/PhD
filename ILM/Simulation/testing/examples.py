@@ -1,8 +1,8 @@
 """examples.py - file for easily testing functionality and creating examples as program is built"""
 
-"""Generate population and propagate infection..."""
+"""Generate population and propagate infection with SI model..."""
 pop = unif_indvs(100, 0, 10, 0, 10, 'test_pop')
-test = si_model(pop, 1, 10, 1, 10)
+test1 = si_model(pop, 1, 10, 1, 10)
 
 """CSV output testing..."""
 savedir="/Users/justin/Dropbox/Projects/[in progress] PhD research/ILM/Simulation/testing/"
@@ -53,11 +53,18 @@ savefig(savedir + "example_mcmc_beta.png")
 plt.plot(mcmc.density)
 savefig(savedir + "example_mcmc_density.png")
 
-
-"""Test SIR model simulation..."""
+"""Test SIcR model simulation..."""
 pop = unif_indvs(100, 0, 10, 0, 10, 'test_pop')
-test1 = sicr_model(pop, 1, 30, 1, 10, 3)
+test2 = sicr_model(pop, 1, 30, 1, 10, 3)
 
 for time in range(1,30):
-    plot_sicr(pop, test1, time)
+    plot_sir(pop, test1, time)
+    savefig(savedir + "SIcR_example_time" + str(time) + ".png")
+    
+"""Test SIR model simulation..."""
+pop = unif_indvs(100, 0, 10, 0, 10, 'test_pop')
+test3 = sir_model(pop, 1, 30, 1, 10, 3)
+
+for time in range(1,30):
+    plot_sir(pop, test3, time)
     savefig(savedir + "SIR_example_time" + str(time) + ".png")

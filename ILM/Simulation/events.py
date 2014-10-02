@@ -70,7 +70,7 @@ def infect(pop, alpha, beta, event_db, time):
     infectious = find_nonrecovered(pop, event_db, time)
     susceptible = find_susceptible(pop, event_db, time)
     prob = infect_prob(pop, alpha, beta, infectious, susceptible)
-    new_infections = susceptible.ind_ID[np.asarray(np.where(prob > np.random.uniform(0, 1, size=prob.size))).flat]
+    new_infections = susceptible.ind_ID[np.asarray(np.where(np.greater(prob,np.random.uniform(0, 1, size=prob.size)))).flat]
     return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, new_infections.size)), 
                          "ind_ID":np.append(event_db.ind_ID, new_infections), 
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",new_infections.size)), 

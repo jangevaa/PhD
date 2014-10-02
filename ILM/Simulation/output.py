@@ -22,7 +22,7 @@ def plot_si(pop, event_db, time):
                          "y":pop.iloc[np.append(i.ind_ID, s.ind_ID)].y})
     plt.scatter(status.x, status.y, c=status.colour, s=60, edgecolors='none')
 
-def plot_sicr(pop, event_db, time):
+def plot_sir(pop, event_db, time):
     """This will create a simple scatterplot of susceptible, infectious, and recovered
     individuals at a given time
     """
