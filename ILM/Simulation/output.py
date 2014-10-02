@@ -17,11 +17,11 @@ def plot_si(pop, event_db, time):
     i=find_infectious(pop, event_db, time)
     s=find_susceptible(pop, event_db, time)
     status=pd.DataFrame({"status":np.append(np.repeat("i", i.shape[0]), np.repeat("s", s.shape[0])), 
+                         "colour":np.append(np.repeat("k", i.shape[0]), np.repeat("b", s.shape[0])),
                          "ind_ID":np.append(i.ind_ID, s.ind_ID),
                          "x":pop.iloc[np.append(i.ind_ID, s.ind_ID)].x,
                          "y":pop.iloc[np.append(i.ind_ID, s.ind_ID)].y})
-    colours = np.where(status.status=="i", "r", "k")
-    plt.scatter(status.x, status.y, c=colours)
+    plt.scatter(status.x, status.y, c=status.colour)
 
 def plot_sicr(pop, event_db, time):
     """This will create a simple scatterplot of susceptible, infectious, and recovered
@@ -30,12 +30,13 @@ def plot_sicr(pop, event_db, time):
     i=find_nonrecovered(pop, event_db, time)
     s=find_susceptible(pop, event_db, time)
     r=find_recovered(pop, event_db, time)
-    status=pd.DataFrame({"status":np.append(np.repeat("i", i.shape[0]), np.repeat("s", s.shape[0])), 
-                         "ind_ID":np.append(i.ind_ID, s.ind_ID),
-                         "x":pop.iloc[np.append(i.ind_ID, s.ind_ID)].x,
-                         "y":pop.iloc[np.append(i.ind_ID, s.ind_ID)].y})
-    colours = np.where(status.status=="i", "r", "k")
-    plt.scatter(status.x, status.y, c=colours)
+    status=pd.DataFrame({"status":np.append(np.append(np.repeat("i", i.shape[0]), np.repeat("s", s.shape[0])),np.repeat("r", r.shape[0])),
+                         "colour":np.append(np.append(np.repeat("k", i.shape[0]), np.repeat("b", s.shape[0])),np.repeat("m", r.shape[0])), 
+                         "ind_ID":np.append(np.append(i.ind_ID, s.ind_ID), r.ind_ID),
+                         "x":pop.iloc[np.append(np.append(i.ind_ID, s.ind_ID), r.ind_ID)].x,
+                         "y":pop.iloc[np.append(np.append(i.ind_ID, s.ind_ID), r.ind_ID)].y})
+    return status
+    plt.scatter(status.x, status.y, c=status.colour)
 
 
 #Unused or incomplete functions currently below this line    
