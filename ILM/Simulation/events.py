@@ -11,23 +11,28 @@ def event_db(n, pop):
                          "event_details":np.repeat("i",n)})
     
 def find_infectious(pop, event_db, time):
-    """Find individuals which are infected at a specified `time` (i.e.had a change in infection status prior to 
+    """Find individuals which have been infected prior to a specified `time` (i.e.had a change in infection status prior to 
     `time`. Function returns the indices of infectious individuals)
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
 
 def find_infectious2(pop, event_db, time):
-    """Find individuals which are infected at a specified `time` (i.e. not susceptible or recovered...)
+    """Find individuals which became infected at a specified `time`.
     """
-    recovered=pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
-    infected=pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
-    return recovered, infected
+    return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time==(time-1))].ind_ID})
 
 def find_susceptible(pop, event_db, time):
     """Find individuals which are still susceptible at a specified `time` (i.e. have not had a change in infection status prior to 
     `time`. Function returns the indices of susceptible individuals)
     """
     return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.time<time)].ind_ID)})
+
+def find_recovered(pop, event_db, time):
+    """Find individuals which have recovered prior to a specified `time` (i.e.had a change in infection status prior to 
+    `time`. Function returns the indices of recovered individuals)
+    """
+    return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID)})
+
 
 def kappa_helper_1(pop, beta, infectious, susceptible, i, j):
     """Find euclidean distance ^ -`beta` between a susceptible individual `i` and an infectious individual `j`."""
@@ -65,7 +70,7 @@ def infect(pop, alpha, beta, event_db, time):
 
 def constant_recover(pop, event_db, time, gamma):
     """Individuals recover after a specified infection duration, `gamma` (constant)."""
-    recovered = np.array(find_infectious(pop, event_db, time-gamma).ind_ID)
+    recovered = np.array(find_infectious2(pop, event_db, time-gamma).ind_ID)
     return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, recovered.size)), 
                          "ind_ID":np.append(event_db.ind_ID, recovered), 
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",recovered.size)), 
