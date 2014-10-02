@@ -84,10 +84,12 @@ def constant_recover(pop, event_db, time, gamma):
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",recovered.size)), 
                          "event_details":np.append(event_db.event_details, np.repeat("r",recovered.size))})
     
-def geometric_recover(pop, event_db, time, p):
-    """Individuals recover following a memoryless recovery probability each time invoked (i.e. geometric)"""
+def geometric_recover(pop, event_db, time, gamma):
+    """Individuals recover following a memoryless recovery probability each time invoked (i.e. geometric).
+    The mean recovery period is `gamma` - which is equal to 1/p in the geometric distribution.
+    """
     nonrecovered=find_nonrecovered(pop, event_db, time)
-    recovered = np.array(nonrecovered.ind_ID[p>np.random.uniform(0,1, nonrecovered.shape[0])])
+    recovered = np.array(nonrecovered.ind_ID[(1./gamma)>np.random.uniform(0,1, nonrecovered.shape[0])])
     return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, recovered.size)), 
                          "ind_ID":np.append(event_db.ind_ID, recovered), 
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",recovered.size)), 

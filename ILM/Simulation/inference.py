@@ -2,9 +2,9 @@
 (Metropolis-Hastings for now) of specific infectious disease models
 """
 
-import scipy as sp
 import scipy.special as special
 import numpy as np
+import pandas as pd
 
 def pdf_gamma(gamma_alpha, gamma_beta, x):
     """Gamma pdf"""
