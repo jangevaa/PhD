@@ -10,13 +10,13 @@ def event_db(n, pop):
                          "event_type":np.repeat("infection_status",n), 
                          "event_details":np.repeat("i",n)})
     
-def find_infectious(pop, event_db, time):
+def find_infectious(event_db, time):
     """Find individuals which have been infected prior to a specified `time` (i.e. had a change in infection status prior to 
     `time`. Function returns the indices of infectious individuals)
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time<time)].ind_ID})
 
-def find_infectious2(pop, event_db, time):
+def find_infectious2(event_db, time):
     """Find individuals which became infected at a specified `time`.
     """
     return pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="i") & (event_db.time==(time-1))].ind_ID})
@@ -27,7 +27,7 @@ def find_susceptible(pop, event_db, time):
     """
     return pd.DataFrame({"ind_ID": np.delete(pop.index, event_db[(event_db.event_type=="infection_status") & (event_db.time<time)].ind_ID)})
     
-def find_nonrecovered(pop, event_db, time):
+def find_nonrecovered(event_db, time):
     """Find individuals which have been infected prior to `time`, but which have not yet recovered.
     """
     recovered = pd.DataFrame({"ind_ID": event_db[(event_db.event_type=="infection_status") & (event_db.event_details=="r") & (event_db.time<time)].ind_ID})
@@ -36,7 +36,7 @@ def find_nonrecovered(pop, event_db, time):
         return np.any(nonrecovered.ind_ID[x] == recovered.ind_ID)
     return nonrecovered[np.invert(map(find_nonrecovered_helper, nonrecovered.index))]        
 
-def find_recovered(pop, event_db, time):
+def find_recovered(event_db, time):
     """Find individuals which have recovered prior to a specified `time` (i.e.had a change in infection status prior to 
     `time`. Function returns the indices of recovered individuals)
     """
@@ -52,7 +52,7 @@ def find_recoverytimes(event_db):
                                       (event_db.event_type == "infection_status") & 
                                       (event_db.event_details == "i") & 
                                       (event_db.ind_ID==recovered[x])])[0]
-    return map(find_recoverytimes_helper, range(0, recovered.shape[0]))
+    return np.array(map(find_recoverytimes_helper, range(0, recovered.shape[0])))
     
 def kappa_helper_1(pop, beta, infectious, susceptible, i, j):
     """Find euclidean distance ^ -`beta` between a susceptible individual `i` and an infectious individual `j`."""
@@ -79,7 +79,7 @@ def infect_prob(pop, alpha, beta, infectious, susceptible):
 
 def infect(pop, alpha, beta, event_db, time):
     """Probablistically propagate disease, and return an updated event database."""
-    infectious = find_nonrecovered(pop, event_db, time)
+    infectious = find_nonrecovered(event_db, time)
     susceptible = find_susceptible(pop, event_db, time)
     prob = infect_prob(pop, alpha, beta, infectious, susceptible)
     new_infections = susceptible.ind_ID[np.asarray(np.where(np.greater(prob,np.random.uniform(0, 1, size=prob.size)))).flat]
@@ -90,7 +90,7 @@ def infect(pop, alpha, beta, event_db, time):
 
 def constant_recover(pop, event_db, time, gamma):
     """Individuals recover after a specified infection duration, `gamma` (constant)."""
-    recovered = np.array(find_infectious2(pop, event_db, time-gamma).ind_ID)
+    recovered = np.array(find_infectious2(event_db, time-gamma).ind_ID)
     return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, recovered.size)), 
                          "ind_ID":np.append(event_db.ind_ID, recovered), 
                          "event_type":np.append(event_db.event_type, np.repeat("infection_status",recovered.size)), 
@@ -100,7 +100,7 @@ def geometric_recover(pop, event_db, time, gamma):
     """Individuals recover following a memoryless recovery probability each time invoked (i.e. geometric).
     The mean recovery period is `gamma` - which is equal to 1/p in the geometric distribution.
     """
-    nonrecovered=find_nonrecovered(pop, event_db, time)
+    nonrecovered=find_nonrecovered(event_db, time)
     recovered = np.array(nonrecovered.ind_ID[(1./gamma)>np.random.uniform(0,1, nonrecovered.shape[0])])
     return pd.DataFrame({"time":np.append(event_db.time, np.repeat(time, recovered.size)), 
                          "ind_ID":np.append(event_db.ind_ID, recovered), 
