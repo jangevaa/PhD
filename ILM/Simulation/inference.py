@@ -59,7 +59,7 @@ def sir_likelihood(pop, event_db, recoverytimes, alpha, beta, gamma):
     susceptible=find_susceptible(pop, event_db, t)
     for t in range(1, np.max(event_db.time)):
         new_nonrecovered=find_nonrecovered(event_db, t+1)
-        new_susceptible=find_susceptible(event_db, t+1)
+        new_susceptible=find_susceptible(pop, event_db, t+1)
         infection_probs=infect_prob(pop, alpha, beta, nonrecovered, susceptible)
         def new_nonrecovered_func(x):
             return any(susceptible.ind_ID[x] == new_nonrecovered.ind_ID)
@@ -108,14 +108,16 @@ def sir_infer(pop, event_db, prior_alpha, init_alpha, prior_beta, init_beta, ini
     density[0] = sir_likelihood(pop, event_db, recoverytimes, alpha[0], beta[0], gamma[0])*prior_alpha(alpha[0])*prior_beta(beta[0])*prior_gamma(gamma[0])
     for i in range(1, iterations):
         proposals = np.random.multivariate_normal([alpha[i-1], beta[i-1], gamma[i-1]], transition_cov)    
-        new_density = si_likelihood(pop, event_db, proposals[0], proposals[1])*geometric_likelihood(recoverytimes, (1/proposals[2]))*prior_alpha(proposals[0])*prior_beta(proposals[1])*prior_gamma(proposals[2])
+        new_density = sir_likelihood(pop, event_db, recoverytimes, proposals[0], proposals[1], proposals[2])*prior_alpha(proposals[0])*prior_beta(proposals[1])*prior_gamma(proposals[2])
         if all([min([1., (new_density/density[i-1])]) > (np.random.uniform(0,1,1)[0]),isinstance(new_density, float), np.invert(np.isnan(new_density))]):
             density[i] = new_density
             alpha[i] = proposals[0]
             beta[i] = proposals[1]
+            gamma[i] = proposals[2]
         else:
             density[i] = density[i-1]
             alpha[i] = alpha[i-1]
             beta[i] = beta[i-1]
-    return pd.DataFrame({'alpha':alpha, 'beta':beta, 'density':density})
+            gamma[i] = gamma[i-1]
+    return pd.DataFrame({'alpha':alpha, 'beta':beta, 'gamma':gamma, 'density':density})
 

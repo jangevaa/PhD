@@ -94,3 +94,10 @@ init_beta=np.random.gamma(5, 1)
 init_gamma=np.random.gamma(5, 1)
 
 mcmc=sir_infer(pop, test3, prior_alpha, init_alpha, prior_beta, init_beta, init_gamma, prior_gamma, 10, [[1,0,0,],[0,4,0],[0,0,1]])
+
+
+### TESTING
+t=21
+nonrecovered=find_nonrecovered(test3, t)
+susceptible=find_susceptible(pop, test3, t)
+infection_probs=infect_prob(pop, 1, 5, nonrecovered, susceptible)
