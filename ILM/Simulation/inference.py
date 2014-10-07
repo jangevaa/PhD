@@ -63,11 +63,11 @@ def sir_likelihood(pop, event_db, recoverytimes, alpha, beta, gamma):
         infection_probs=infect_prob(pop, alpha, beta, nonrecovered, susceptible)
         def new_nonrecovered_func(x):
             return any(susceptible.ind_ID[x] == new_nonrecovered.ind_ID)
-        new_nonrecovered = map(new_nonrecovered_func, susceptible.index)
-        daily_likelihood[t-1]=np.prod(np.subtract(1, infection_probs[np.where(np.invert(new_nonrecovered))]))*np.prod(infection_probs[np.where(new_nonrecovered)])    
+        recovery_index = map(new_nonrecovered_func, susceptible.index)
+        daily_likelihood[t-1]=np.prod(np.subtract(1, infection_probs[np.where(np.invert(recovery_index))]))*np.prod(infection_probs[np.where(recovery_index)])    
         nonrecovered=new_nonrecovered
         susceptible=new_susceptible
-    return np.prod(daily_likelihood)*geometric_likelihood(recoverytimes, (1./gamma))
+    return np.prod(daily_likelihood) *geometric_likelihood(recoverytimes, (1./gamma))
     
             
 def si_infer(pop, event_db, prior_alpha, init_alpha, prior_beta, init_beta, iterations, transition_cov):
