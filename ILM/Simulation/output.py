@@ -38,8 +38,8 @@ def plot_sir(pop, event_db, time):
     
 def epi_curve(event_db):
     """Display curve with the number of infected individuals at each time point"""
-    num_infected = [0]*(np.max(event_db.time)-1)
+    num_infected = [0]*(np.max(event_db.time)+1)
     for t in range(1, np.max(event_db.time)):
-        num_infected[t-1] = find_nonrecovered(event_db, t).shape[0]
-    plt.plot(range(1, np.max(event_db.time)), num_infected, linewidth=2)
+        num_infected[t] = find_nonrecovered(event_db, t).shape[0]
+    plt.plot(range(0, (np.max(event_db.time)+1)), num_infected, linewidth=2)
                 
