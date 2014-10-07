@@ -41,5 +41,5 @@ def epi_curve(event_db):
     num_infected = [0]*(np.max(event_db.time)-1)
     for t in range(1, np.max(event_db.time)):
         num_infected[t-1] = find_nonrecovered(event_db, t).shape[0]
-    plt.scatter(range(1, np.max(event_db.time)), num_infected)
+    plt.plot(range(1, np.max(event_db.time)), num_infected, linewidth=2)
                 
