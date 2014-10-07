@@ -65,6 +65,32 @@ for time in range(1,30):
 pop = unif_indvs(100, 0, 10, 0, 10, 'test_pop')
 test3 = sir_model(pop, 1, 30, 1, 10, 3)
 
-for time in range(1,30):
+
+"""SIR Plotting..."""
+for time in range(1,(np.max(test3.time)+1)):
     plot_sir(pop, test3, time)
     savefig(savedir + "SIR_example_time" + str(time) + ".png")
+    
+"""SIR Inference..."""
+def prior_alpha(x):
+    gamma_alpha=5
+    gamma_beta=1
+    return pdf_gamma(gamma_alpha, gamma_beta, x)
+
+def prior_beta(x):
+    gamma_alpha=5
+    gamma_beta=1
+    return pdf_gamma(gamma_alpha, gamma_beta, x)
+
+def prior_gamma(x):
+    gamma_alpha=5
+    gamma_beta=1
+    return pdf_gamma(gamma_alpha, gamma_beta, x)
+                
+init_alpha=np.random.gamma(5, 1)
+
+init_beta=np.random.gamma(5, 1)
+
+init_gamma=np.random.gamma(5, 1)
+
+mcmc=sir_infer(pop, test3, prior_alpha, init_alpha, prior_beta, init_beta, init_gamma, prior_gamma, 10, [[1,0,0,],[0,4,0],[0,0,1]])
