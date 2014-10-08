@@ -3,6 +3,7 @@ simulation.py - the main ILM simulation framework, which utilizes several module
 event-sourcing-like method of simulating disease dynamics.
 """
 
+import events as *
 import numpy as np
 import pandas as pd
 

@@ -2,6 +2,7 @@
 (Metropolis-Hastings for now) of specific infectious disease models
 """
 
+import events as *
 import scipy.special as special
 import numpy as np
 import pandas as pd

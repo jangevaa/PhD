@@ -1,5 +1,6 @@
 """output.py - a number of output options (visualizations and text)"""
 
+import events as *
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
