@@ -1,4 +1,4 @@
-PhD
+ILM tools
 ===
 
-Programming and manuscript developments
+Tools to simulate and perform inference of Individual Level Models of infectious diseases
