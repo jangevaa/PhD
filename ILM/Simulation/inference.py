@@ -2,10 +2,12 @@
 (Metropolis-Hastings for now) of specific infectious disease models
 """
 
-import events as *
+from events import find_infectious, find_susceptible, find_nonrecovered, infect_prob, find_recoverytimes
 import scipy.special as special
 import numpy as np
 import pandas as pd
+
+__all__ = ['pdf_gamma', 'pdf_unif', 'pdf_norm', 'si_infer', 'sir_infer']
 
 def pdf_gamma(gamma_alpha, gamma_beta, x):
     """Gamma pdf"""

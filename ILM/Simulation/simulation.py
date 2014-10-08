@@ -3,9 +3,7 @@ simulation.py - the main ILM simulation framework, which utilizes several module
 event-sourcing-like method of simulating disease dynamics.
 """
 
-import events as *
-import numpy as np
-import pandas as pd
+from events import event_db, infect, constant_recover, geometric_recover
 
 def si_model(pop, init, length, alpha, beta):
     """Discrete SI (susceptible, infected) ILM. `init` are the amount of initial infections which are randomly generated
