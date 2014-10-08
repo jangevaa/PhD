@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+__all__ = ['plot_si', 'plot_sir', 'epi_curve']
+
 """csv output instructions: you can easily export a csv of the population file or the
 event database by using the `DF.to_csv("/dir/ect/ory/")`, where DF represents the data
 that will be exported.

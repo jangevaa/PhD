@@ -1,5 +1,4 @@
-"""
-simulation.py - the main ILM simulation framework, which utilizes several modules to execute an 
+"""simulation.py - the main ILM simulation framework, which utilizes several modules to execute an 
 event-sourcing-like method of simulating disease dynamics.
 """
 
