@@ -3,6 +3,8 @@
 import numpy as np
 import pandas as pd
 
+__all__ = ['find_infectious', 'find_susceptible', 'find_nonrecovered', 'find_recovered', 'find_recoverytimes', 'infect_prob', 'infect', 'constant_recover', 'geometric_recover']
+
 def event_db(n, pop):
     """Create an event database, and with `n` initial infection events, based on a specified population, `pop`."""
     return pd.DataFrame({"time":np.repeat(0, n), 

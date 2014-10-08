@@ -5,6 +5,8 @@ event-sourcing-like method of simulating disease dynamics.
 
 from events import event_db, infect, constant_recover, geometric_recover
 
+__all__ = ['si_model', 'sicr_model', 'sir_model']
+
 def si_model(pop, init, length, alpha, beta):
     """Discrete SI (susceptible, infected) ILM. `init` are the amount of initial infections which are randomly generated
     at time 0. `length` is the simulation length in days.

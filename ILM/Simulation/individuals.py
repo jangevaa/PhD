@@ -3,6 +3,8 @@
 import numpy as np
 import pandas as pd
 
+__all__ = ['unif_indvs', 'norm_indvs', 'multi_groups']
+
 def unif_indvs(n, x1, x2, y1, y2, group):
     """Generates `n`, random uniformly distributed individuals over a cartesian study area bounded East-West by x1 and x2,
     and North-South by `y1` and `y2` with group name `group`.
