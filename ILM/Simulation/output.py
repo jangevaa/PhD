@@ -1,6 +1,6 @@
 """output.py - a number of output options (visualizations and text)"""
 
-from events import *
+from events import find_infectious, find_susceptible, find_nonrecovered, find_recovered
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
