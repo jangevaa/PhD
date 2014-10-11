@@ -18,12 +18,12 @@ def pdf_gamma(gamma_alpha, gamma_beta, x):
         
 def pdf_unif(lower, upper, x):
     """Uniform pdf"""
-    def pdf_unif(x):
+    def pdf_unif_helper(x):
         if lower < x < upper:
             return 1./(upper-lower)
         else:
             return 0.
-    return map(pdf_unif, x)
+    return map(pdf_unif_helper, x)
     
 def pdf_norm(mean, var, x):
     """Normal pdf"""
