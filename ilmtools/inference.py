@@ -38,10 +38,10 @@ def si_likelihood(pop, event_db, alpha, beta):
     """
     daily_likelihood=[0]*(np.max(event_db.time)-1)
     t=1
-    infectious=find_infectious(pop, event_db, t)
+    infectious=find_infectious(event_db, t)
     susceptible=find_susceptible(pop, event_db, t)
     for t in range(1, np.max(event_db.time)):
-        new_infectious=find_infectious(pop, event_db, t+1)
+        new_infectious=find_infectious(event_db, t+1)
         new_susceptible=find_susceptible(pop, event_db, t+1)
         infection_probs=infect_prob(pop, alpha, beta, infectious, susceptible)
         def new_infections_func(x):
